@@ -34,7 +34,5 @@ class UserController extends GetxController {
             'body': body,
           }
         }));
-
-    print(response.body);
   }
 }

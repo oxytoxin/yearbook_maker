@@ -17,6 +17,10 @@ class AdminYearbooksListController extends GetxController {
   void getYearbooks() {
     Stream<QuerySnapshot> stream = firestore.collection('yearbooks').snapshots();
     yearbooks.bindStream(stream.map((q) => q.docs.map((yearbook) => Yearbook.fromDocumentSnapshot(yearbook)).toList()));
+    yearbooks.sort((a, b) => b.schoolYear.compareTo(a.schoolYear));
+    yearbooks.listen((p0) {
+      p0.sort((a, b) => b.schoolYear.compareTo(a.schoolYear));
+    });
     loading.value = false;
   }
 

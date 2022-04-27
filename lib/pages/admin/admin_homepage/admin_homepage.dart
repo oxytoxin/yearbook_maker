@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:yearbook_maker/pages/admin/admin_homepage/admin_homepage_controller.dart';
@@ -15,56 +14,18 @@ class AdminHomepage extends GetView<AdminHomepageController> {
           title: const Text('ADMIN HOMEPAGE'),
           actions: [
             IconButton(
-                onPressed: () {
-                  controller.logout();
-                },
-                icon: const Icon(Icons.logout))
+              onPressed: () {
+                controller.logout();
+              },
+              icon: const Icon(Icons.person_pin),
+            ),
+            IconButton(
+              onPressed: () {
+                controller.logout();
+              },
+              icon: const Icon(Icons.logout),
+            ),
           ],
-        ),
-        drawer: Drawer(
-          child: ListView(
-            children: [
-              const SizedBox(
-                height: 28,
-              ),
-              ListTile(
-                onTap: () {
-                  Get.toNamed('/admin/homepage');
-                },
-                title: const Text(
-                  'Home',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              ListTile(
-                onTap: () {
-                  Get.toNamed('/admin/users_list');
-                },
-                title: const Text(
-                  'Users List',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              ListTile(
-                onTap: () {
-                  Get.toNamed('/admin/yearbooks_list');
-                },
-                title: const Text(
-                  'Yearbooks List',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
         body: controller.loading.value
             ? const Center(
@@ -72,81 +33,88 @@ class AdminHomepage extends GetView<AdminHomepageController> {
               )
             : Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ListView(
+                child: Column(
                   children: [
-                    CachedNetworkImage(
-                      height: 200,
-                      imageUrl: controller.userController.user.value.image == ''
-                          ? 'https://avatarairlines.com/wp-content/uploads/2020/05/Male-placeholder.jpeg'
-                          : controller.userController.user.value.image,
-                      placeholder: (context, url) => const SizedBox(
-                        height: 200,
-                        width: 200,
-                        child: Center(
-                          child: CircularProgressIndicator(),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                controller.totalStudents.toString(),
+                                style: const TextStyle(fontSize: 48),
+                              ),
+                              const Text('Total Student Users'),
+                            ],
+                          ),
                         ),
-                      ),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                controller.totalTeachers.toString(),
+                                style: const TextStyle(fontSize: 48),
+                              ),
+                              const Text('Total Teacher Users'),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(
-                      height: 20,
+                    Expanded(
+                        child: ListView(
+                      children: [
+                        ...controller.yearbooks.map(
+                          (yearbook) => InkWell(
+                            onTap: () {
+                              Get.toNamed('/admin/yearbook_preview/' + yearbook.id);
+                            },
+                            child: Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(yearbook.title),
+                                      Text(yearbook.schoolYear),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('${yearbook.students.length} students'),
+                                      Text('${yearbook.teachers.length} teachers'),
+                                    ],
+                                  ),
+                                ]),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                              onPressed: () {
+                                Get.toNamed('/admin/users_list');
+                              },
+                              child: const Text('MANAGE USERS')),
+                        ),
+                        const SizedBox(
+                          width: 16,
+                        ),
+                        Expanded(
+                          child: ElevatedButton(
+                              onPressed: () {
+                                Get.toNamed('/admin/yearbooks_list');
+                              },
+                              child: const Text('MANAGE YEARBOOKS')),
+                        ),
+                      ],
                     ),
-                    const Text(
-                      'First Name',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      controller.userController.user.value.firstName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    const Text(
-                      'Last Name',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      controller.userController.user.value.lastName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    const Text(
-                      'Email Address',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      controller.userController.user.value.email,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    const Text(
-                      'Role',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      controller.userController.user.value.role,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    ElevatedButton(
-                        onPressed: () {
-                          Get.toNamed('/admin/edit_user/${controller.userController.user.value.id}');
-                        },
-                        child: const Text('EDIT'))
                   ],
                 )),
       ),

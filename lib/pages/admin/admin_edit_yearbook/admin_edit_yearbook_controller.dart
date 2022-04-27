@@ -67,6 +67,15 @@ class AdminEditYearbookController extends GetxController {
     }
   }
 
+  Iterable<List<T>> chunks<T>(List<T> lst, int n) sync* {
+    final gen = List.generate(lst.length ~/ n + 1, (e) => e * n);
+    for (int i in gen) {
+      if (i < lst.length) {
+        yield lst.sublist(i, i + n < lst.length ? i + n : lst.length);
+      }
+    }
+  }
+
   void publish(Map<String, dynamic> values) async {
     save(values, publish: true);
     if (yearbook.value.students.isEmpty || yearbook.value.teachers.isEmpty) {
@@ -76,26 +85,41 @@ class AdminEditYearbookController extends GetxController {
     }
     students = [];
     teachers = [];
-    var studentDoc =
-        await FirebaseFirestore.instance.collection('users').where('__name__', whereIn: yearbook.value.students).get();
-    var teacherDoc =
-        await FirebaseFirestore.instance.collection('users').where('__name__', whereIn: yearbook.value.teachers).get();
-    for (var doc in studentDoc.docs) {
-      if (doc.data()['image'] == '') {
-        _loader.unload();
-        Get.snackbar('Error', 'Some students have no image.');
-        return;
+    var studentList = chunks(yearbook.value.students, 10);
+    for (var chunk in studentList) {
+      var studentDoc =
+          await FirebaseFirestore.instance.collection('users').where(FieldPath.documentId, whereIn: chunk).get();
+      for (var doc in studentDoc.docs) {
+        if (doc.data()['image'] == '') {
+          _loader.unload();
+          Get.snackbar('Error', 'Some students have no image.');
+          return;
+        }
+        students.add(User.fromDocumentSnapshot(doc));
       }
-      students.add(User.fromDocumentSnapshot(doc));
     }
-    for (var doc in teacherDoc.docs) {
-      if (doc.data()['image'] == '') {
-        _loader.unload();
-        Get.snackbar('Error', 'Some teachers have no image.');
-        return;
+    var teacherList = chunks(yearbook.value.teachers, 10);
+
+    for (var chunk in teacherList) {
+      var teacherDoc =
+          await FirebaseFirestore.instance.collection('users').where(FieldPath.documentId, whereIn: chunk).get();
+
+      for (var doc in teacherDoc.docs) {
+        if (doc.data()['image'] == '') {
+          _loader.unload();
+          Get.snackbar('Error', 'Some teachers have no image.');
+          return;
+        }
+        teachers.add(User.fromDocumentSnapshot(doc));
       }
-      teachers.add(User.fromDocumentSnapshot(doc));
     }
+
+    students.sort((a, b) {
+      return a.lastName.toLowerCase().compareTo(b.lastName.toLowerCase());
+    });
+    teachers.sort((a, b) {
+      return a.lastName.toLowerCase().compareTo(b.lastName.toLowerCase());
+    });
     Directory? dir = await getTemporaryDirectory();
     for (var student in students) {
       File photo = File("${dir.path}/${student.id}.jpeg");
