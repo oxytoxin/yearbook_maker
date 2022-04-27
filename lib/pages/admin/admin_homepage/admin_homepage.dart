@@ -15,7 +15,7 @@ class AdminHomepage extends GetView<AdminHomepageController> {
           actions: [
             IconButton(
               onPressed: () {
-                controller.logout();
+                Get.toNamed('/admin/edit_user/${controller.userController.user.value.id}');
               },
               icon: const Icon(Icons.person_pin),
             ),
