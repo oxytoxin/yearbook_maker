@@ -32,6 +32,8 @@ class AdminEditYearbook extends GetView<AdminEditYearbookController> {
                           hintText: 'Title',
                           labelText: 'Title',
                         ),
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
                         initialValue: controller.yearbook.value.title,
                         validator: FormBuilderValidators.compose([
                           FormBuilderValidators.required(context),
@@ -46,6 +48,8 @@ class AdminEditYearbook extends GetView<AdminEditYearbookController> {
                           hintText: 'School Year',
                           labelText: 'School Year',
                         ),
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
                         initialValue: controller.yearbook.value.schoolYear,
                         validator: FormBuilderValidators.compose([
                           FormBuilderValidators.required(context),
